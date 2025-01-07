@@ -39,6 +39,9 @@ jobs:
           npm version ${{ github.event.inputs.version_type }} -m "Release %s"
           echo "NEW_VERSION=$(node -p "require('./package.json').version")" >> $GITHUB_ENV
 
+      - name: Push changes
+        run: git push --follow-tags
+
       - name: Create GitHub Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -47,7 +50,4 @@ jobs:
             --title "Release v${NEW_VERSION}" \
             --notes "Release v${NEW_VERSION}" \
             --draft=false \
-            --prerelease=false
-
-      - name: Push changes
-        run: git push --follow-tags 
+            --prerelease=false 
