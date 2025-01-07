@@ -136,9 +136,6 @@ jobs:
         run: npm ci
         
       - name: Build
-        env:
-          RUSTFLAGS: ${{ matrix.os == 'macos-latest' && '-C target-feature=-aes,+crc,+crypto' || '' }}
-          MACOSX_DEPLOYMENT_TARGET: ${{ matrix.os == 'macos-latest' && '10.15' || '' }}
         run: npm run build-rust-release
         
       - name: Package binary
