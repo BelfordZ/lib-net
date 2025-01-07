@@ -142,7 +142,7 @@ jobs:
         run: npm run build-rust-release
         
       - name: Rebuild native module
-        run: node-pre-gyp rebuild
+        run: npx node-pre-gyp rebuild
         
       - name: Package binary
         run: npm run package-binary
