@@ -124,6 +124,11 @@ jobs:
           override: true
           target: ${{ matrix.os == 'macos-latest' && 'aarch64-apple-darwin' || '' }}
 
+      - name: Add Rust to PATH
+        run: |
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+          source "$HOME/.cargo/env"
+
       - name: Install System Dependencies (Ubuntu)
         if: matrix.os == 'ubuntu-latest'
         run: |

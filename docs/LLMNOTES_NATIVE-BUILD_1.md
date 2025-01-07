@@ -14,6 +14,7 @@
    - Build rust from correct directory (shardus_net)
    - Copy built module to correct location
    - Maintain proper directory structure
+   - Removed scripts directory from package files
 3. Build Process Flow:
    ```bash
    cd shardus_net          # Go to Rust project directory
@@ -35,6 +36,21 @@ lib-net/
 ├── binding.gyp
 └── package.json
 ```
+
+## Package Contents
+The following are included in the published package:
+1. Source files:
+   - src/**/*
+   - Cargo.*
+   - shardus_net/**/*
+   - crypto/**/*
+   - shardeum_utils/**/*
+2. Build artifacts:
+   - build/**/*
+   - native/**/*
+3. Configuration:
+   - package.json
+   - binding.gyp
 
 ## Build Process Flow
 1. Development Build:
