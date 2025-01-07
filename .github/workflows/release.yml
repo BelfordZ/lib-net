@@ -118,7 +118,7 @@ jobs:
       - uses: actions/setup-node@v3
 
       - name: Setup Rust
-        uses: dtolnay/rust-toolchain@1.70.0
+        uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
 
