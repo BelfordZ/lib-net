@@ -117,10 +117,13 @@ jobs:
       
       - uses: actions/setup-node@v3
 
-      - name: Setup Rust
-        uses: dtolnay/rust-toolchain@stable
+      - name: Install Rust toolchain
+        uses: actions-rs/toolchain@v1
         with:
-          components: rustfmt, clippy
+          profile: minimal
+          toolchain: stable
+          override: true
+          target: ${{ matrix.os == 'macos-latest' && 'aarch64-apple-darwin' || '' }}
 
       - name: Install System Dependencies (Ubuntu)
         if: matrix.os == 'ubuntu-latest'
