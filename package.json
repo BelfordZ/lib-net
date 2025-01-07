@@ -18,7 +18,6 @@
     "shardus_net/**/*",
     "crypto/**/*",
     "shardeum_utils/**/*",
-    "scripts/**/*",
     "native/**/*",
     "binding.gyp"
   ],

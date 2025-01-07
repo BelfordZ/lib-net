@@ -84,7 +84,6 @@ jobs:
             shardus_net/ \
             crypto/ \
             shardeum_utils/ \
-            scripts/ \
             native/
       
       - name: Upload TypeScript build
