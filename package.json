@@ -19,15 +19,14 @@
     "crypto/**/*",
     "shardeum_utils/**/*",
     "scripts/**/*",
-    "native/**/*"
+    "native/**/*",
+    "binding.gyp"
   ],
   "scripts": {
-    "install": "node-pre-gyp install --fallback-to-build || npm run build-rust-release",
-    "build": "npm run build-rust-release && npm run build-node",
+    "install": "node-pre-gyp install --fallback-to-build || npm run build",
+    "build": "npm run build-rust && npm run build-node",
     "build-node": "tsc -p .",
-    "build-rust": "cargo-cp-artifact --artifact cdylib shardus_net native/shardus-net.node -- cargo build --message-format=json-render-diagnostics",
-    "build-rust-debug": "npm run build-rust --",
-    "build-rust-release": "npm run build-rust -- --release",
+    "build-rust": "cd shardus_net && neon build --release && cd .. && mkdir -p native && cp shardus_net/index.node native/",
     "package-binary": "node-pre-gyp package",
     "publish-binary": "node-pre-gyp publish",
     "compile": "npm run build-node",
@@ -35,7 +34,7 @@
     "lint": "eslint \"./src/**/*.ts\"",
     "format-check": "prettier --check \"./src/**/*.ts\"",
     "format-fix": "prettier --write \"./src/**/*.ts\"",
-    "clean": "cargo clean",
+    "clean": "cargo clean && rm -rf build native",
     "test": "jest"
   },
   "repository": {
@@ -61,7 +60,7 @@
     "uuid": "3.3.2"
   },
   "devDependencies": {
-    "cargo-cp-artifact": "0.1",
+    "neon-cli": "^0.10.1",
     "@ethereumjs/tx": "5.4.0",
     "@ethereumjs/util": "9.1.0",
     "@types/node": "18.19.1",

@@ -139,7 +139,7 @@ jobs:
         run: npm ci
         
       - name: Build
-        run: npm run build-rust-release
+        run: npm run build-rust
         
       - name: Debug file locations
         run: |
