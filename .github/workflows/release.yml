@@ -141,8 +141,19 @@ jobs:
       - name: Build
         run: npm run build-rust-release
         
-      - name: Rebuild native module
-        run: npx node-pre-gyp rebuild
+      - name: Debug file locations
+        run: |
+          echo "Contents of native directory:"
+          ls -R native/
+          echo "Contents of build directory:"
+          ls -R build/ || true
+        
+      - name: Ensure native directory structure
+        run: |
+          mkdir -p native/${{ matrix.platform }}-x64
+          mv native/shardus-net.node native/${{ matrix.platform }}-x64/ || echo "Failed to move file"
+          echo "After move, contents of native directory:"
+          ls -R native/
         
       - name: Package binary
         run: npm run package-binary
