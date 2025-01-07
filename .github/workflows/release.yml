@@ -47,14 +47,15 @@ jobs:
 
       - name: Create GitHub Release
         id: create_release
+        uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release create v${NEW_VERSION} \
-            --title "Release v${NEW_VERSION}" \
-            --notes "Release v${NEW_VERSION}" \
-            --draft=false \
-            --prerelease=false
+        with:
+          tag_name: v${{ env.NEW_VERSION }}
+          release_name: Release v${{ env.NEW_VERSION }}
+          body: Release v${{ env.NEW_VERSION }}
+          draft: false
+          prerelease: false
 
   build-typescript:
     needs: create-release
