@@ -6,17 +6,50 @@ Fundamentally, this is just a networked event emitter. Under the hood, the libra
 
 ## Installation
 
-You can install shardus net via npm:
-
-```sh
-npm i gitlab:shardus/shardus-net
+### Regular Installation
+```bash
+npm install github:shardeum/lib-net
 ```
 
-## Local Development
+This will automatically download pre-built binaries for your platform if available. If no pre-built binary is available, it will fall back to building from source.
 
-If you're working on the `shardus-net` package, make sure to run the command `npm run build` manually to ensure both TypeScript and Rust files are generated.
+### Development Setup
+If you want to build from source or contribute to development:
+```bash
+# Clone the repository
+git clone https://github.com/shardeum/lib-net.git
+cd lib-net
 
-For publishing a release to NPM, simply run `npm run release` command.
+# Install dependencies and build
+npm install
+npm run build
+```
+
+### Build Process
+The package includes Rust native modules which are:
+- Pre-built for common platforms and attached to GitHub releases
+- Automatically downloaded during installation
+- Built from source as fallback if no pre-built binary is available
+
+## Development
+
+### Building
+- `npm run build` - Build both TypeScript and Rust code
+- `npm run build-node` - Build only TypeScript
+- `npm run build-rust` - Build only Rust code
+- `npm test` - Run tests
+
+### Creating Releases
+Releases are managed through GitHub Actions:
+1. New releases are created via the GitHub Actions UI
+2. Pre-built binaries are automatically generated for all platforms
+3. Binaries are attached to the GitHub release
+
+### Development Tips
+- Use `npm install --ignore-scripts` to skip binary builds during installation
+- Run `npm run build-rust` when you need to rebuild only the Rust code
+- Use `npm run build-node` for TypeScript-only builds
+- Run `npm test` to run the test suite
 
 ## Usage
 
