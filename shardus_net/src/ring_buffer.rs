@@ -48,7 +48,7 @@ impl<T> RingBuffer<T> {
     where
         T: Default + Copy + Ord + Sum<T> + Debug,
     {
-        #[cfg(debug)]
+        #[cfg(feature = "debug")]
         info!("{:?}", self.buffer);
 
         let total = self.buffer.iter().cloned().sum::<T>();
