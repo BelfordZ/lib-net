@@ -136,6 +136,8 @@ jobs:
         run: npm ci
         
       - name: Build
+        env:
+          RUSTFLAGS: ${{ matrix.os == 'macos-latest' && '-C target-feature=-aes' || '' }}
         run: npm run build-rust-release
         
       - name: Package binary
