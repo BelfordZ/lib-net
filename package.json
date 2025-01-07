@@ -9,7 +9,7 @@
     "module_path": "native/{platform}-{arch}/",
     "remote_path": "./v{version}",
     "package_name": "{module_name}-v{version}-{node_abi}-{platform}-{arch}.tar.gz",
-    "host": "https://github.com/shardeum/lib-net/releases/download"
+    "host": "https://github.com/BelfordZ/lib-net/releases/download"
   },
   "files": [
     "src/**/*",
@@ -40,7 +40,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/shardeum/lib-net.git"
+    "url": "https://github.com/BelfordZ/lib-net.git"
   },
   "publishConfig": {
     "access": "public",
