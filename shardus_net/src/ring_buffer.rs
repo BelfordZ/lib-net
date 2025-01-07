@@ -1,5 +1,5 @@
 use std::{fmt::Debug, iter::Sum};
-#[cfg(debug)]
+#[cfg(feature = "debug")]
 use log::info;
 
 pub(crate) struct RingBuffer<T> {

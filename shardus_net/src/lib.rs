@@ -8,7 +8,7 @@ use std::time::Instant;
 use std::{net::ToSocketAddrs, sync::Arc};
 
 use header_factory::header_from_json_string;
-#[cfg(debug)]
+#[cfg(feature = "debug")]
 use log::info;
 //use log::LevelFilter;
 use lru::LruCache;
