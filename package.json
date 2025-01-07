@@ -25,7 +25,7 @@
     "install": "node-pre-gyp install --fallback-to-build || npm run build-rust-release",
     "build": "npm run build-rust-release && npm run build-node",
     "build-node": "tsc -p .",
-    "build-rust": "./node_modules/.bin/cargo-cp-artifact --artifact cdylib shardus_net native/shardus-net.node -- cargo build --message-format=json-render-diagnostics",
+    "build-rust": "cargo-cp-artifact --artifact cdylib shardus_net native/shardus-net.node -- cargo build --message-format=json-render-diagnostics",
     "build-rust-debug": "npm run build-rust --",
     "build-rust-release": "npm run build-rust -- --release",
     "package-binary": "node-pre-gyp package",
