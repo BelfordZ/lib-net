@@ -1,3 +1,9 @@
 [workspace]
-members = ["shardus_net", "crypto", "shardeum_utils"]
-resolver = "1"
+members = [
+    "shardus_net",
+    "crypto",
+    "shardeum_utils"
+]
+
+[workspace.dependencies]
+time = "0.3.35"

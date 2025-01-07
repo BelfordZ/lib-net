@@ -116,12 +116,16 @@ jobs:
           ref: v${{ needs.create-release.outputs.new_version }}
       
       - uses: actions/setup-node@v3
-          
+
       - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
           override: true
+          
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: "native-build"
           
       - name: Install dependencies
         run: npm ci
