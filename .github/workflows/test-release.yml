@@ -1,0 +1,118 @@
+name: Test Released Package
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_tag:
+        description: 'Version/tag to test (e.g., v1.4.33)'
+        required: true
+        type: string
+
+jobs:
+  test-install:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false  # Continue with other OS tests even if one fails
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            platform: linux
+          - os: windows-latest
+            platform: win32
+          - os: macos-latest
+            platform: darwin
+    
+    steps:
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.19.1'  # Matching the engine requirement
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@shardus'
+
+      - name: Create Test Project
+        shell: bash
+        run: |
+          mkdir test-project
+          cd test-project
+          echo '{
+            "name": "test-project",
+            "version": "1.0.0",
+            "private": true,
+            "dependencies": {
+              "@shardus/net": "${{ inputs.version_tag }}"
+            }
+          }' > package.json
+          
+          # Create test file
+          echo 'const shardusNet = require("@shardus/net");
+          console.log("Successfully imported @shardus/net");
+          console.log("Module exports:", Object.keys(shardusNet));' > test.js
+
+          # Create npm config to prevent fallback to build
+          echo 'node-pre-gyp-only=true' > .npmrc
+
+      - name: Install Package
+        working-directory: test-project
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          npm_config_node_pre_gyp_only: "true"  # Prevent fallback to build
+        run: |
+          # Ensure no Rust toolchain is available
+          if command -v rustc &> /dev/null || command -v cargo &> /dev/null; then
+            echo "❌ Error: Rust toolchain detected. This test must run without Rust to ensure prebuilt binaries work."
+            exit 1
+          fi
+          
+          # Try the install
+          if ! npm install; then
+            echo "❌ Error: Installation failed. This might indicate it tried to build from source."
+            exit 1
+          fi
+          
+          echo "✅ Package installed successfully without Rust toolchain"
+
+      - name: Verify No Build Artifacts
+        working-directory: test-project
+        shell: bash
+        run: |
+          # Check for any build artifacts that would indicate compilation
+          if [ -d "node_modules/@shardus/net/build" ]; then
+            echo "❌ Error: Build directory found, suggesting compilation occurred"
+            exit 1
+          fi
+          
+          if [ -f "node_modules/@shardus/net/build.log" ]; then
+            echo "❌ Error: Build log found, suggesting compilation occurred"
+            exit 1
+          fi
+
+      - name: Verify Binary Installation
+        working-directory: test-project
+        shell: bash
+        run: |
+          echo "Checking for prebuilt binary..."
+          ls -R node_modules/@shardus/net/native
+          
+          # Verify we have the correct platform binary
+          if [ ! -f "node_modules/@shardus/net/native/${{ matrix.platform }}-x64/shardus-net.node" ]; then
+            echo "❌ Error: Platform-specific binary not found!"
+            exit 1
+          fi
+          
+          echo "✅ Correct prebuilt binary found"
+
+      - name: Test Import
+        working-directory: test-project
+        run: node test.js
+
+      - name: Report Success
+        shell: bash
+        run: |
+          echo "✅ Successfully tested @shardus/net ${{ inputs.version_tag }} on ${{ matrix.platform }}"
+          echo "   ✓ Package installed WITHOUT any compilation"
+          echo "   ✓ No Rust toolchain present during installation"
+          echo "   ✓ No build artifacts found (pure prebuilt binary usage)"
+          echo "   ✓ Correct platform-specific binary present"
+          echo "   ✓ Module successfully imported and tested" 

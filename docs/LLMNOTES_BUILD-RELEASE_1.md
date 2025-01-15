@@ -88,4 +88,34 @@ Added Windows-specific configurations:
 3. Key Considerations:
    - Platform identifier: win32
    - Architecture: x64
-   - Native module path: `native/win32-x64/shardus-net.node` 
+   - Native module path: `native/win32-x64/shardus-net.node`
+
+### Release Testing Workflow (2024-03)
+Added a new workflow (`test-release.yml`) to verify released packages:
+1. Test Scope:
+   - Strict prebuilt binary verification
+   - Fails if Rust toolchain is present
+   - Fails if any compilation occurs
+   - Fails if build artifacts are found
+   - Verifies module import functionality
+2. Platform Coverage:
+   - Linux (ubuntu-latest)
+   - Windows (windows-latest)
+   - macOS (macos-latest)
+3. Test Process:
+   - Creates a clean test project
+   - Enforces node-pre-gyp-only mode
+   - Verifies absence of Rust toolchain
+   - Checks for absence of build artifacts
+   - Validates correct binary installation
+   - Tests module importability
+4. Usage:
+   - Manually triggered via GitHub Actions
+   - Requires version/tag parameter (e.g., v1.4.33)
+   - Reports detailed success/failure for each platform
+5. Success Criteria:
+   - No Rust toolchain present
+   - No compilation attempted
+   - No build artifacts created
+   - Correct prebuilt binary present
+   - Module imports successfully 
