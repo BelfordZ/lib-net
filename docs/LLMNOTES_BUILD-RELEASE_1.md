@@ -94,10 +94,12 @@ Added Windows-specific configurations:
 Added a new workflow (`test-release.yml`) to verify released packages:
 1. Test Scope:
    - Strict prebuilt binary verification
-   - Fails if Rust toolchain is present
-   - Fails if any compilation occurs
-   - Fails if build artifacts are found
-   - Verifies module import functionality
+   - Multi-faceted compilation detection:
+     * npm install output analysis
+     * Installation timing checks
+     * Build artifact scanning
+     * Download URL verification
+   - Module functionality testing
 2. Platform Coverage:
    - Linux (ubuntu-latest)
    - Windows (windows-latest)
@@ -105,17 +107,21 @@ Added a new workflow (`test-release.yml`) to verify released packages:
 3. Test Process:
    - Creates a clean test project
    - Enforces node-pre-gyp-only mode
-   - Verifies absence of Rust toolchain
-   - Checks for absence of build artifacts
+   - Captures and analyzes npm install logs
+   - Verifies download vs build indicators
+   - Checks installation duration
    - Validates correct binary installation
    - Tests module importability
-4. Usage:
-   - Manually triggered via GitHub Actions
-   - Requires version/tag parameter (e.g., v1.4.33)
-   - Reports detailed success/failure for each platform
+4. Compilation Detection:
+   - Monitors npm output for compilation keywords
+   - Checks for node-pre-gyp download messages
+   - Verifies installation completes quickly
+   - Scans for Rust/Cargo artifacts
+   - Validates binary download URLs
 5. Success Criteria:
-   - No Rust toolchain present
-   - No compilation attempted
-   - No build artifacts created
+   - Installation logs show binary download
+   - No compilation messages in output
+   - Installation completes quickly (<30s)
    - Correct prebuilt binary present
+   - Binary downloaded from correct release
    - Module imports successfully 

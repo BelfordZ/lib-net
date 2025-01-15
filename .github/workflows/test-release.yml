@@ -58,20 +58,75 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           npm_config_node_pre_gyp_only: "true"  # Prevent fallback to build
+          NPM_CONFIG_LOGLEVEL: "verbose"  # Get detailed logs
         run: |
-          # Ensure no Rust toolchain is available
-          if command -v rustc &> /dev/null || command -v cargo &> /dev/null; then
-            echo "❌ Error: Rust toolchain detected. This test must run without Rust to ensure prebuilt binaries work."
+          # Start timing
+          INSTALL_START=$(date +%s)
+          
+          # Capture npm install output
+          NPM_OUTPUT=$(npm install 2>&1)
+          NPM_EXIT_CODE=$?
+          
+          # End timing
+          INSTALL_END=$(date +%s)
+          INSTALL_DURATION=$((INSTALL_END-INSTALL_START))
+          
+          # Echo the full output for logs
+          echo "$NPM_OUTPUT"
+          
+          # Check for compilation indicators in the output
+          if echo "$NPM_OUTPUT" | grep -iE "cargo|rustc|building|compiling" > /dev/null; then
+            echo "❌ Error: Detected compilation-related messages in npm output"
             exit 1
           fi
           
-          # Try the install
-          if ! npm install; then
-            echo "❌ Error: Installation failed. This might indicate it tried to build from source."
+          # Check for node-pre-gyp download indicators
+          if ! echo "$NPM_OUTPUT" | grep -iE "downloaded|tarball|prebuilt" > /dev/null; then
+            echo "❌ Error: No indication of prebuilt binary download found"
             exit 1
           fi
           
-          echo "✅ Package installed successfully without Rust toolchain"
+          # Check installation time (more than 30 seconds might indicate compilation)
+          if [ $INSTALL_DURATION -gt 30 ]; then
+            echo "❌ Warning: Installation took $INSTALL_DURATION seconds, which is suspicious for a prebuilt binary"
+            echo "Full npm output:"
+            echo "$NPM_OUTPUT"
+            exit 1
+          fi
+          
+          # Check the npm install exit code
+          if [ $NPM_EXIT_CODE -ne 0 ]; then
+            echo "❌ Error: Installation failed with exit code $NPM_EXIT_CODE"
+            exit 1
+          fi
+          
+          echo "✅ Package installed successfully in $INSTALL_DURATION seconds"
+          echo "✅ Verified prebuilt binary was downloaded (not compiled)"
+
+      - name: Verify Installation Method
+        working-directory: test-project
+        shell: bash
+        run: |
+          # Look for node-pre-gyp logs that indicate download vs build
+          if [ -f "node_modules/@shardus/net/npm-debug.log" ]; then
+            if grep -i "build" "node_modules/@shardus/net/npm-debug.log"; then
+              echo "❌ Error: Found build-related messages in npm debug log"
+              exit 1
+            fi
+          fi
+          
+          # Check for any cargo/rust artifacts
+          if find . -type f -name "Cargo.lock" -o -name "target" -o -name ".cargo" | grep .; then
+            echo "❌ Error: Found Rust/Cargo artifacts suggesting compilation"
+            exit 1
+          fi
+          
+          # Verify the binary was downloaded from the correct release
+          EXPECTED_URL="https://github.com/BelfordZ/lib-net/releases/download/v${{ inputs.version_tag }}"
+          if ! grep -r "$EXPECTED_URL" node_modules/@shardus/net/; then
+            echo "❌ Error: No evidence of download from correct release URL"
+            exit 1
+          fi
 
       - name: Verify No Build Artifacts
         working-directory: test-project
