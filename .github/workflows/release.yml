@@ -114,7 +114,7 @@ jobs:
         with:
           ref: v${{ needs.create-release.outputs.new_version }}
       
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
 
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
