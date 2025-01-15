@@ -44,3 +44,29 @@
 3. Debug file locations: Check where files are actually being placed
 4. Move to platform directory: `mkdir -p native/{platform}-x64 && mv native/shardus-net.node native/{platform}-x64/`
 5. Package binary: `npm run package-binary` 
+
+## Binary Packaging Configuration
+
+The project uses node-pre-gyp for binary packaging with the following configuration:
+- module_name: shardus-net
+- module_path: native/{platform}-{arch}/
+- package_name: {module_name}-v{version}-{node_abi}-{platform}-{arch}.tar.gz
+
+### Release Workflow Issue (2024-03)
+The GitHub Actions release workflow was failing because it was looking for the packaged binary in `./build/stage/*.tar.gz`, but node-pre-gyp likely generates it in a different location based on its configuration.
+
+Potential fixes:
+1. Update the upload step to use the correct path pattern that matches node-pre-gyp's output
+2. Add a debug step to locate the generated .tar.gz file
+3. Consider using wildcards to find the file regardless of its exact name 
+
+### Implemented Solution
+The workflow has been updated to:
+1. Add a debug step to list all .tar.gz files in the workspace
+2. Dynamically find the correct tarball path using `find`
+3. Use the found path in the upload step instead of a hardcoded location
+
+This makes the release process more robust by:
+- Not assuming a specific output location
+- Providing better debugging information
+- Handling different possible output locations from node-pre-gyp 

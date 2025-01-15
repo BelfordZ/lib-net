@@ -191,12 +191,28 @@ jobs:
       - name: Package binary
         run: npm run package-binary
         
+      - name: Debug - Find tar.gz files
+        run: |
+          echo "Looking for .tar.gz files in the workspace:"
+          find . -name "*.tar.gz" -type f
+          
       - name: Upload binary to release
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: ./build/stage/*.tar.gz
+          asset_path: ${{ steps.find_tarball.outputs.tarball_path }}
           asset_name: shardus-net-${{ matrix.platform }}.tar.gz
-          asset_content_type: application/gzip 
+          asset_content_type: application/gzip
+
+      - name: Find tarball path
+        id: find_tarball
+        run: |
+          TARBALL_PATH=$(find . -name "*.tar.gz" -type f | grep -v "typescript-build.tar.gz" | head -n 1)
+          if [ -z "$TARBALL_PATH" ]; then
+            echo "No .tar.gz file found!"
+            exit 1
+          fi
+          echo "tarball_path=$TARBALL_PATH" >> $GITHUB_OUTPUT
+          echo "Found tarball at: $TARBALL_PATH" 
