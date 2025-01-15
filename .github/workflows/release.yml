@@ -90,14 +90,10 @@ jobs:
             native/
       
       - name: Upload TypeScript build
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: actions/upload-artifact@v3
         with:
-          upload_url: ${{ needs.create-release.outputs.upload_url }}
-          asset_path: ./typescript-build.tar.gz
-          asset_name: typescript-build.tar.gz
-          asset_content_type: application/gzip
+          name: typescript-build
+          path: typescript-build.tar.gz
 
   build-native:
     needs: create-release
@@ -161,11 +157,6 @@ jobs:
           choco install openssl
           choco install llvm
         shell: pwsh
-     
-      - name: Check Rust install
-        run: |
-          rustc --version
-          cargo --version
 
       - uses: Swatinem/rust-cache@v2
         with:
@@ -222,6 +213,12 @@ jobs:
           echo "tarball_path=$TARBALL_PATH" >> $GITHUB_OUTPUT
           echo "Found tarball at: $TARBALL_PATH"
           
+      - name: Upload binary artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.platform }}-binary
+          path: ${{ steps.find_tarball.outputs.tarball_path }}
+      
       - name: Upload binary to release
         uses: actions/upload-release-asset@v1
         env:
@@ -230,4 +227,36 @@ jobs:
           upload_url: ${{ needs.create-release.outputs.upload_url }}
           asset_path: ${{ steps.find_tarball.outputs.tarball_path }}
           asset_name: shardus-net-${{ matrix.platform }}.tar.gz
-          asset_content_type: application/gzip 
+          asset_content_type: application/gzip
+
+  publish-npm:
+    needs: [create-release, build-native, build-typescript]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: v${{ needs.create-release.outputs.new_version }}
+      
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          registry-url: 'https://registry.npmjs.org'
+      
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: artifacts
+
+      - name: Setup binary files
+        run: |
+          mkdir -p native
+          cp -r artifacts/*-binary/* native/
+          tar xzf artifacts/typescript-build/typescript-build.tar.gz
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Publish to NPM
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }} 

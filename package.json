@@ -7,9 +7,9 @@
   "binary": {
     "module_name": "shardus-net",
     "module_path": "native/{platform}-{arch}/",
-    "remote_path": "./v{version}",
+    "remote_path": ".",
     "package_name": "{module_name}-v{version}-{node_abi}-{platform}-{arch}.tar.gz",
-    "host": "https://github.com/BelfordZ/lib-net/releases/download"
+    "host": "https://registry.npmjs.org/@shardus/net"
   },
   "files": [
     "src/**/*",
@@ -42,7 +42,7 @@
   },
   "publishConfig": {
     "access": "public",
-    "registry": "https://npm.pkg.github.com"
+    "registry": "https://registry.npmjs.org/"
   },
   "contributors": [
     "Aaron Sullivan",
