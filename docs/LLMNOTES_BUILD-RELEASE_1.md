@@ -69,4 +69,9 @@ The workflow has been updated to:
 This makes the release process more robust by:
 - Not assuming a specific output location
 - Providing better debugging information
-- Handling different possible output locations from node-pre-gyp 
+- Handling different possible output locations from node-pre-gyp
+
+### File Location Discovery (2024-03)
+- Actual file location: `./build/stage/v{version}/shardus-net-v{version}-node-v{node_abi}-{platform}-x64.tar.gz`
+- Example: `./build/stage/v1.4.31/shardus-net-v1.4.31-node-v108-linux-x64.tar.gz`
+- Fixed workflow step ordering to ensure file path is found before upload attempt 
