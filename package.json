@@ -1,6 +1,6 @@
 {
   "name": "@shardus/net",
-  "version": "1.4.27",
+  "version": "1.4.28",
   "description": "",
   "main": "build/src/index.js",
   "types": "build/src/index.d.ts",
@@ -25,7 +25,7 @@
     "install": "node-pre-gyp install --fallback-to-build || npm run build",
     "build": "npm run build-rust && npm run build-node",
     "build-node": "tsc -p .",
-    "build-rust":"cargo-cp-artifact --artifact cdylib shardus_net shardus-net.node -- cargo build --message-format=json-render-diagnostics",
+    "build-rust": "cargo-cp-artifact --artifact cdylib shardus_net shardus-net.node -- cargo build --message-format=json-render-diagnostics",
     "package-binary": "node-pre-gyp package",
     "publish-binary": "node-pre-gyp publish",
     "compile": "npm run build-node",
