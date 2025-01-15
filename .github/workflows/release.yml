@@ -137,16 +137,33 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y curl jq build-essential pkg-config libssl-dev
+     
+      - name: Check Rust install
+        run: |
+          rustc --version
+          cargo --version
 
       - uses: Swatinem/rust-cache@v2
         with:
           shared-key: "native-build"
           
+      - name: Check Rust install
+        run: |
+          rustc --version
+          cargo --version
+
       - name: Install dependencies
         run: npm ci
         
+      - name: Check Rust install
+        run: |
+          rustc --version
+          cargo --version
+
       - name: Build
-        run: npm run build-rust
+        run: |
+          source "$HOME/.cargo/env"
+          npm run build-rust
         
       - name: Debug file locations
         run: |
