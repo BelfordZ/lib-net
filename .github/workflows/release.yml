@@ -108,8 +108,8 @@ jobs:
         include:
           - os: ubuntu-latest
             platform: linux
-          - os: windows-latest
-            platform: win32
+          # - os: windows-latest
+          #   platform: win32
           - os: macos-latest
             platform: darwin
     steps:
