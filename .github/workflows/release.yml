@@ -119,15 +119,18 @@ jobs:
       - name: Install Rust toolchain
         uses: actions-rs/toolchain@v1
         with:
-          profile: minimal
           toolchain: stable
           override: true
-          target: ${{ matrix.os == 'macos-latest' && 'aarch64-apple-darwin' || '' }}
 
       - name: Add Rust to PATH
         run: |
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
           source "$HOME/.cargo/env"
+      
+      - name: Check Rust install
+        run: |
+          rustc --version
+          cargo --version
 
       - name: Install System Dependencies (Ubuntu)
         if: matrix.os == 'ubuntu-latest'
