@@ -106,14 +106,14 @@ jobs:
       matrix:
         os: [
           ubuntu-latest,
-          # windows-latest,
+          windows-latest,
           macos-latest
         ]
         include:
           - os: ubuntu-latest
             platform: linux
-          # - os: windows-latest
-          #   platform: win32
+          - os: windows-latest
+            platform: win32
           - os: macos-latest
             platform: darwin
     steps:
@@ -132,9 +132,17 @@ jobs:
           override: true
 
       - name: Add Rust to PATH
+        if: matrix.os != 'windows-latest'
         run: |
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
           source "$HOME/.cargo/env"
+
+      - name: Add Rust to PATH (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          echo "$HOME/.cargo/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          $env:Path = "$HOME/.cargo/bin;$env:Path"
+        shell: pwsh
       
       - name: Check Rust install
         run: |
@@ -146,6 +154,13 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y curl jq build-essential pkg-config libssl-dev
+
+      - name: Install System Dependencies (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          choco install openssl
+          choco install llvm
+        shell: pwsh
      
       - name: Check Rust install
         run: |
@@ -156,25 +171,22 @@ jobs:
         with:
           shared-key: "native-build"
           
-      - name: Check Rust install
-        run: |
-          rustc --version
-          cargo --version
-
       - name: Install dependencies
         run: npm ci
         
-      - name: Check Rust install
-        run: |
-          rustc --version
-          cargo --version
-
       - name: Build
+        if: matrix.os != 'windows-latest'
         run: |
           source "$HOME/.cargo/env"
           npm run build-rust
+
+      - name: Build (Windows)
+        if: matrix.os == 'windows-latest'
+        run: npm run build-rust
+        shell: pwsh
         
       - name: Debug file locations
+        shell: bash
         run: |
           echo "Contents of native directory:"
           ls -R native/
@@ -182,6 +194,7 @@ jobs:
           ls -R build/ || true
         
       - name: Ensure native directory structure
+        shell: bash
         run: |
           mkdir -p native/${{ matrix.platform }}-x64
           mv native/shardus-net.node native/${{ matrix.platform }}-x64/ || echo "Failed to move file"
@@ -192,12 +205,14 @@ jobs:
         run: npm run package-binary
         
       - name: Debug - Find tar.gz files
+        shell: bash
         run: |
           echo "Looking for .tar.gz files in the workspace:"
           find . -name "*.tar.gz" -type f
 
       - name: Find tarball path
         id: find_tarball
+        shell: bash
         run: |
           TARBALL_PATH=$(find . -name "*.tar.gz" -type f | grep -v "typescript-build.tar.gz" | head -n 1)
           if [ -z "$TARBALL_PATH" ]; then

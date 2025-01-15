@@ -74,4 +74,18 @@ This makes the release process more robust by:
 ### File Location Discovery (2024-03)
 - Actual file location: `./build/stage/v{version}/shardus-net-v{version}-node-v{node_abi}-{platform}-x64.tar.gz`
 - Example: `./build/stage/v1.4.31/shardus-net-v1.4.31-node-v108-linux-x64.tar.gz`
-- Fixed workflow step ordering to ensure file path is found before upload attempt 
+- Fixed workflow step ordering to ensure file path is found before upload attempt
+
+### Windows Build Support (2024-03)
+Added Windows-specific configurations:
+1. System Dependencies:
+   - OpenSSL via Chocolatey
+   - LLVM via Chocolatey
+2. Build Adjustments:
+   - PowerShell for Windows-specific commands
+   - Bash shell for cross-platform file operations
+   - Modified PATH handling for Rust toolchain
+3. Key Considerations:
+   - Platform identifier: win32
+   - Architecture: x64
+   - Native module path: `native/win32-x64/shardus-net.node` 
